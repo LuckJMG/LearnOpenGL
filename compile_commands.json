@@ -1,0 +1,45 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-Ilib/glad/include",
+      "-Ilib",
+      "lib/glad/src/glad.c"
+    ],
+    "directory": "/home/luck/Projects/learn-opengl",
+    "file": "/home/luck/Projects/learn-opengl/lib/glad/src/glad.c"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "glad.o",
+      "-Ilib/glad/include",
+      "-Ilib",
+      "-Wall",
+      "-o",
+      "output",
+      "src/main.cpp"
+    ],
+    "directory": "/home/luck/Projects/learn-opengl",
+    "file": "/home/luck/Projects/learn-opengl/src/main.cpp",
+    "output": "/home/luck/Projects/learn-opengl/output"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "glad.o",
+      "-Ilib/glad/include",
+      "-Ilib",
+      "-Wall",
+      "-o",
+      "output",
+      "src/shader/shader.cpp"
+    ],
+    "directory": "/home/luck/Projects/learn-opengl",
+    "file": "/home/luck/Projects/learn-opengl/src/shader/shader.cpp",
+    "output": "/home/luck/Projects/learn-opengl/output"
+  }
+]

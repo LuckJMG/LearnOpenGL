@@ -1,0 +1,10 @@
+# Compilation
+cache/
+tmp/
+*.o
+output
+compile_commands.json
+
+# Otros
+disco_poggers.jpg
+

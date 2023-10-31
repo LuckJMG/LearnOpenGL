@@ -2,6 +2,7 @@
 #define SHADER_H
 
 #include <string>
+#include <glm/glm.hpp>
 
 class Shader {
 public:
@@ -13,6 +14,12 @@ public:
 	void set(const std::string &name, bool value) const;
 	void set(const std::string &name, int value) const;
 	void set(const std::string &name, float value) const;
+	void set(const std::string &name, glm::vec2 &vector) const;
+	void set(const std::string &name, glm::vec3 &vector) const;
+	void set(const std::string &name, glm::vec4 &vector) const;
+	void set(const std::string &name, glm::mat2 &matrix) const;
+	void set(const std::string &name, glm::mat3 &matrix) const;
+	void set(const std::string &name, glm::mat4 &matrix) const;
 
 private:
 	unsigned int ID;

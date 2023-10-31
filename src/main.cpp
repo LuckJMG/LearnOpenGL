@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <stb/stb_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -86,7 +86,7 @@ int main() {
 	// load image, create texture and generate mipmaps
 	stbi_set_flip_vertically_on_load(true);  
 	int width, height, channels;
-	unsigned char *rawTexture = stbi_load("./textures/disco_poggers.jpg", &width, &height, &channels, 0);
+	unsigned char *rawTexture = stbi_load("./textures/container.jpg", &width, &height, &channels, 0);
 	if (rawTexture)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rawTexture);

@@ -1,7 +1,8 @@
 # Compilation
-cache/
+.cache/
 tmp/
 *.o
+!glad.o
 output
 compile_commands.json
 

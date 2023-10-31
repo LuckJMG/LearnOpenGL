@@ -1,14 +1,11 @@
 FLAGS := -Wall
-LIBS :=  -lglfw -ldl -Ilib/glad/include -Ilib/glm -Ilib
+LIBS :=  -lglfw -ldl -Ilib/glad/include -Ilib
 
-output: src/main.cpp src/shader/shader.cpp glad.o
-	g++ src/main.cpp src/shader/shader.cpp glad.o $(LIBS) $(FLAGS) -o output
-
-glad.o:
-	g++ -c lib/glad/src/glad.c -lglfw -ldl -Ilib/glad/include
+output: src/main.cpp src/shader/shader.cpp
+	g++ src/main.cpp src/shader/shader.cpp lib/glad/src/glad.o $(LIBS) $(FLAGS) -o output
 
 clean:
-	rm output *.o
+	rm output
 
 run:
 	./output

@@ -168,6 +168,8 @@ int main() {
 		glm::vec3(-1.3f,  1.0f, -1.5f)  
 	};
 
+
+	constexpr float RADIUS = 10.0f;
 	// Render loop
 	while(!glfwWindowShouldClose(window)) {
 		// input
@@ -184,8 +186,14 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture1);
 
 		// project
+		float cameraX = sin(glfwGetTime()) * RADIUS;
+		float cameraY = cos(glfwGetTime()) * RADIUS;
 		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		view = glm::lookAt(
+			glm::vec3(cameraX, 0.0f, cameraY),
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		);
 		basic.set("view", view);
 
 		glm::mat4 projection = glm::mat4(1.0f);

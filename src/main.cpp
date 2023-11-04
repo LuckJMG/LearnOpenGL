@@ -13,22 +13,18 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "shader/shader.h"
+#include "camera/camera.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);  
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);  
 void mouseCallback(GLFWwindow* window, double x, double y);
-void scrollCallback(GLFWwindow* window, double offsetX, double offsetY);
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
 
-glm::vec3 cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-float fov { 45.0f };
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float deltaTime { 0.0f };
 float lastFrame { 0.0f };
-float lastX { 400 };
-float lastY { 300 };
-float yaw { -90.0f };
-float pitch { 0.0f };
+float lastX { 400.0f };
+float lastY { 300.0f };
 bool recentlyOpen { true };
 
 int main() {
@@ -46,7 +42,7 @@ int main() {
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -112,10 +108,9 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	// texture coord attribute
+
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
@@ -128,7 +123,6 @@ int main() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
 	stbi_set_flip_vertically_on_load(true);  
 	int width, height, channels;
 	unsigned char *rawTexture = stbi_load("./textures/container.jpg", &width, &height, &channels, 0);
@@ -146,11 +140,9 @@ int main() {
 	unsigned int texture1;
 	glActiveTexture(GL_TEXTURE1);
 	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	rawTexture = stbi_load("./textures/awesomeface.png", &width, &height, &channels, 0);
@@ -205,16 +197,11 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture1);
 
 		// project
-		glm::mat4 view = glm::mat4(1.0f);
-		view = glm::lookAt(
-			cameraPosition,
-			cameraPosition + cameraFront,
-			cameraUp
-		);
+		glm::mat4 view = camera.getViewMatrix();
 		basic.set("view", view);
 
 		glm::mat4 projection = glm::mat4(1.0f);
-		projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
 		basic.set("projection", projection);
 
 		// render container
@@ -231,7 +218,6 @@ int main() {
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -243,7 +229,7 @@ int main() {
 	return 0;
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 } 
 
@@ -254,50 +240,29 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
 		recentlyOpen = false;
 	}
 
-	float offsetX { static_cast<float>(x) - lastX };
-	float offsetY { lastY - static_cast<float>(y) };
+	float xOffset { static_cast<float>(x) - lastX };
+	float yOffset { lastY - static_cast<float>(y) };
 	lastX = x;
 	lastY = y;
 
-	constexpr float sensitivity { 0.01f };
-	offsetX *= sensitivity;
-	offsetY *= sensitivity;
-
-	yaw += offsetX;
-	pitch += offsetY;
-
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction.y = sin(glm::radians(pitch));
-	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(direction);
+	camera.processMouseMovement(xOffset, yOffset);
 }
 
-void scrollCallback(GLFWwindow* window, double offsetX, double offsetY) {
-	fov -= static_cast<float>(offsetY);
-	if (fov < 1.0f)
-		fov = 1.0f;
-	if (fov > 45.0f)
-		fov = 45.0f;
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
+	camera.processMouseScroll(yOffset);
 }
 
 void processInput(GLFWwindow* window) {
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	float cameraSpeed = 2.5f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPosition += cameraSpeed * cameraFront;
+		camera.processKeyboard(CameraMovement::forward, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPosition -= cameraSpeed * cameraFront;
+		camera.processKeyboard(CameraMovement::backward, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPosition += cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
+		camera.processKeyboard(CameraMovement::right, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPosition -= cameraSpeed * glm::normalize(glm::cross(cameraFront, cameraUp));
+		camera.processKeyboard(CameraMovement::left, deltaTime);
 }
 

@@ -128,7 +128,6 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	glm::vec3 lightPosition{ 1.2f, 1.0f, 2.0f };
 
 	// Render loop
 	while(!glfwWindowShouldClose(window)) {
@@ -140,6 +139,8 @@ int main() {
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glm::vec3 lightPosition{ 1.2f, 1.0f, 2.0f + sin(glfwGetTime()) };
 
 		// Cube
 		basic.use();

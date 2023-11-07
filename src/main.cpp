@@ -149,7 +149,7 @@ int main() {
 		basic.set("objectColor", objectColor);
 		glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 		basic.set("lightColor", lightColor);
-		basic.set("lightPosition", lightPosition);
+		basic.set("worldLightPosition", lightPosition);
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
 		basic.set("projection", projection);

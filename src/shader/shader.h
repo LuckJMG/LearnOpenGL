@@ -4,6 +4,21 @@
 #include <string>
 #include <glm/glm.hpp>
 
+struct Material {
+	glm::vec3 ambientIntensity {};
+	glm::vec3 diffuseIntensity {};
+	glm::vec3 specularIntensity {};
+	float shininess {};
+};
+
+struct LightSource {
+	glm::vec3 position {};
+
+	glm::vec3 ambientIntensity {};
+	glm::vec3 diffuseIntensity {};
+	glm::vec3 specularIntensity {};
+};
+
 class Shader {
 public:
 	Shader(const char* vertexPath, const char* fragmentPath);

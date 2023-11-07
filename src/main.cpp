@@ -27,6 +27,11 @@ float lastX { 400.0f };
 float lastY { 300.0f };
 bool recentlyOpen { true };
 
+std::ostream& operator<< (std::ostream& out, const glm::vec3& vector) {
+	out << "(" << vector.x << ", " << vector.y << ", " << vector.z << ')';
+	return out;
+}
+
 int main() {
 	// Init GLFW
 	glfwInit();
@@ -128,6 +133,19 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
+	LightSource light {
+		glm::vec3{ 1.2f, 1.0f, 2.0f },
+		glm::vec3{ 0.2f },
+		glm::vec3{ 0.5f },
+		glm::vec3{ 1.0f },
+	};
+
+	Material material {
+		glm::vec3{ 1.0f, 0.5f, 0.31f },
+		glm::vec3{ 1.0f, 0.5f, 0.31f },
+		glm::vec3{ 0.5f, 0.5f, 0.5f },
+		32.0f
+	};
 
 	// Render loop
 	while(!glfwWindowShouldClose(window)) {
@@ -140,21 +158,32 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::vec3 lightPosition{ 1.2f, 1.0f, 2.0f + sin(glfwGetTime()) };
+		light.position.z = 2.0f + sin(glfwGetTime());
 
 		// Cube
 		basic.use();
-		basic.set("viewPosition", camera.position);
-		glm::vec3 objectColor(1.0f, 0.5f, 0.31f);
-		basic.set("objectColor", objectColor);
-		glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-		basic.set("lightColor", lightColor);
-		basic.set("worldLightPosition", lightPosition);
+		glm::vec3 lightColor {
+			sin(static_cast<float>(glfwGetTime()) * 2.0f),
+			sin(static_cast<float>(glfwGetTime()) * 0.7f),
+			sin(static_cast<float>(glfwGetTime()) * 1.3f),
+		};
+		light.ambientIntensity = glm::vec3(0.5f) * lightColor;
+		light.diffuseIntensity = glm::vec3(0.2f) * lightColor;
+		basic.set("lightSource.ambientIntensity", light.ambientIntensity);
+		basic.set("lightSource.diffuseIntensity", light.diffuseIntensity);
+		basic.set("lightSource.specularIntensity", light.specularIntensity);
+
+		basic.set("material.ambientIntensity", material.ambientIntensity);
+		basic.set("material.diffuseIntensity", material.diffuseIntensity);
+		basic.set("material.specularIntensity", material.specularIntensity);
+		basic.set("material.shininess", material.shininess);
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
 		basic.set("projection", projection);
 
 		glm::mat4 view = camera.getViewMatrix();
+		glm::vec3 worldLightPosition = glm::vec3(view * glm::vec4(light.position, 1.0f));
+		basic.set("lightSource.position", worldLightPosition);
 		basic.set("view", view);
 
 		glm::mat4 model = glm::mat4(1.0f);
@@ -168,7 +197,7 @@ int main() {
 		lightSource.set("projection", projection);
 		lightSource.set("view", view);
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPosition);
+		model = glm::translate(model, light.position);
 		model = glm::scale(model, glm::vec3(0.2f));
 		lightSource.set("model", model);
 

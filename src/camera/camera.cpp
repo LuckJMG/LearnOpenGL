@@ -19,13 +19,13 @@ void Camera::setMovementSpeed(double movementSpeed) {
 	this->movementSpeed = movementSpeed;
 }
 
-void Camera::setMouseSensitivity(double mouseSensitivity) {
-	if (mouseSensitivity <= 0) {
+void Camera::setRotationSpeed(double rotationSpeed) {
+	if (rotationSpeed <= 0) {
 		std::cerr << "WARNING: Setting mouse sensitivity below or equal to 0" << std::endl;
 		return;
 	}
 
-	this->mouseSensitivity = mouseSensitivity;
+	this->rotationSpeed = rotationSpeed;
 }
 
 void Camera::setZoom(float zoom) {
@@ -51,13 +51,22 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
 		position += right * velocity;
 	if (direction == CameraMovement::left)
 		position -= right * velocity;
+	if (direction == CameraMovement::up)
+		position += up * velocity;
+	if (direction == CameraMovement::down)
+		position -= up * velocity;
 }
-void Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPitch) {
-	xOffset *= mouseSensitivity;
-	yOffset *= mouseSensitivity;
+void Camera::processArrows(CameraMovement direction, float deltaTime, bool constrainPitch) {
+	float velocity = rotationSpeed * deltaTime;
 
-	yaw += xOffset;
-	pitch += yOffset;
+	if (direction == CameraMovement::left)
+		yaw -= velocity;
+	if (direction == CameraMovement::right)
+		yaw += velocity;
+	if (direction == CameraMovement::up)
+		pitch += velocity;
+	if (direction == CameraMovement::down)
+		pitch -= velocity;
 
 	if (constrainPitch) {
 		if (pitch > 89.0)

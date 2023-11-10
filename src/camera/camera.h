@@ -9,6 +9,8 @@ enum class CameraMovement {
 	backward,
 	left,
 	right,
+	up,
+	down,
 };
 
 class Camera {
@@ -28,24 +30,24 @@ public:
 		float pitch = 0.0f
 	)
 	: position { position }, worldUp { up }, yaw { yaw }, pitch { pitch }, 
-		movementSpeed { 1.0f }, mouseSensitivity { 0.01f }, zoom { 45.0f } {
+		movementSpeed { 1.0f }, rotationSpeed { 100.0f }, zoom { 45.0f } {
 		updateCameraVectors();
 	};
 
 	glm::mat4 getViewMatrix();
 
 	void setMovementSpeed(double movementSpeed);
-	void setMouseSensitivity(double mouseSensitivity);
+	void setRotationSpeed(double rotationSpeed);
 	float getZoom() { return zoom; };
 	void setZoom(float zoom);
 
 	void processKeyboard(CameraMovement direction, float deltaTime);
-	void processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
+	void processArrows(CameraMovement direction, float deltaTime, bool constrainPitch = true);
 	void processMouseScroll(float yOffset);
 
 private:
 	float movementSpeed;
-	float mouseSensitivity;
+	float rotationSpeed;
 	float zoom;
 	void updateCameraVectors();
 };

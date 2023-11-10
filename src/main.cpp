@@ -48,9 +48,7 @@ int main() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Check glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -167,8 +165,8 @@ int main() {
 			sin(static_cast<float>(glfwGetTime()) * 0.7f),
 			sin(static_cast<float>(glfwGetTime()) * 1.3f),
 		};
-		light.ambientIntensity = glm::vec3(0.5f) * lightColor;
-		light.diffuseIntensity = glm::vec3(0.2f) * lightColor;
+		light.diffuseIntensity = glm::vec3(0.5f) * lightColor;
+		light.ambientIntensity = glm::vec3(0.2f) * light.diffuseIntensity;
 		basic.set("lightSource.ambientIntensity", light.ambientIntensity);
 		basic.set("lightSource.diffuseIntensity", light.diffuseIntensity);
 		basic.set("lightSource.specularIntensity", light.specularIntensity);
@@ -200,6 +198,7 @@ int main() {
 		model = glm::translate(model, light.position);
 		model = glm::scale(model, glm::vec3(0.2f));
 		lightSource.set("model", model);
+		lightSource.set("lightColor", lightColor);
 
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -220,21 +219,6 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 } 
 
-void mouseCallback(GLFWwindow* window, double x, double y) {
-	if (recentlyOpen) {
-		lastX = x;
-		lastY = y;
-		recentlyOpen = false;
-	}
-
-	float xOffset { static_cast<float>(x) - lastX };
-	float yOffset { lastY - static_cast<float>(y) };
-	lastX = x;
-	lastY = y;
-
-	camera.processMouseMovement(xOffset, yOffset);
-}
-
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
 	camera.processMouseScroll(yOffset);
 }
@@ -251,5 +235,19 @@ void processInput(GLFWwindow* window) {
 		camera.processKeyboard(CameraMovement::right, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		camera.processKeyboard(CameraMovement::left, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		camera.processKeyboard(CameraMovement::up, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		camera.processKeyboard(CameraMovement::down, deltaTime);
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		camera.processArrows(CameraMovement::right, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		camera.processArrows(CameraMovement::left, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		camera.processArrows(CameraMovement::up, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		camera.processArrows(CameraMovement::down, deltaTime);
+
 }
 

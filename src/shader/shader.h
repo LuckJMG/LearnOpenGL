@@ -5,14 +5,14 @@
 #include <glm/glm.hpp>
 
 struct Material {
-	glm::vec3 ambientIntensity {};
-	glm::vec3 diffuseIntensity {};
-	glm::vec3 specularIntensity {};
+	unsigned int diffuseMap {};
+	unsigned int specularMap {};
 	float shininess {};
 };
 
 struct LightSource {
 	glm::vec3 position {};
+	glm::vec3 color {};
 
 	glm::vec3 ambientIntensity {};
 	glm::vec3 diffuseIntensity {};
@@ -28,6 +28,7 @@ public:
 	void use();
 	void set(const std::string &name, bool value) const;
 	void set(const std::string &name, int value) const;
+	void set(const std::string &name, unsigned int value) const;
 	void set(const std::string &name, float value) const;
 	void set(const std::string &name, glm::vec2 &vector) const;
 	void set(const std::string &name, glm::vec3 &vector) const;

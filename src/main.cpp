@@ -147,12 +147,14 @@ int main() {
 	Material material {
 		loadTexture("textures/container2.png"),
 		loadTexture("textures/container2_specular.png"),
+		loadTexture("textures/matrix.jpg"),
 		32.0f
 	};
 
 	basic.use();
 	basic.set("material.diffuseMap", 0);
 	basic.set("material.specularMap", 1);
+	basic.set("material.emissionMap", 2);
 
 	// Render loop
 	while(!glfwWindowShouldClose(window)) {
@@ -190,6 +192,9 @@ int main() {
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, material.specularMap);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, material.emissionMap);
 
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);

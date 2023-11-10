@@ -11,6 +11,7 @@ struct LightSource {
 struct Material {
 	sampler2D diffuseMap;
 	sampler2D specularMap;
+	sampler2D emissionMap;
 	float shininess;
 };
 
@@ -36,7 +37,9 @@ void main() {
 	float specular = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	vec3 specularLight = lightSource.specularIntensity * specular * texture(material.specularMap, textureCoordinates).rgb;
 
-	vec3 result = ambientLight + diffuseLight + specularLight;
+	vec3 emissionLight = texture(material.emissionMap, textureCoordinates).rgb;
+
+	vec3 result = ambientLight + diffuseLight + specularLight + emissionLight;
 	outColor = vec4(result, 1.0f);
 }
 

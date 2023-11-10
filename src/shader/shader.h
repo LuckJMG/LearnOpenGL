@@ -7,6 +7,7 @@
 struct Material {
 	unsigned int diffuseMap {};
 	unsigned int specularMap {};
+	unsigned int emissionMap {};
 	float shininess {};
 };
 

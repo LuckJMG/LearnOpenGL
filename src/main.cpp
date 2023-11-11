@@ -14,6 +14,7 @@
 
 #include "shader/shader.h"
 #include "camera/camera.h"
+#include "lightSource/lightSource.h"
 
 unsigned int loadTexture(char const* path);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);  
@@ -59,7 +60,7 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	Shader basic("shaders/basic_vertex.glsl", "shaders/basic_fragment.glsl");
+	Shader cube("shaders/basic_vertex.glsl", "shaders/basic_fragment.glsl");
 	Shader lightSource("shaders/basic_vertex.glsl", "shaders/lightSourceFragmentShader.glsl");
 
 	float vertices[] = {
@@ -107,6 +108,19 @@ int main() {
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
+	glm::vec3 cubePositions[] = {
+		glm::vec3( 0.0f,  0.0f,  0.0f),
+		glm::vec3( 2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3( 2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3( 1.3f, -2.0f, -2.5f),
+		glm::vec3( 1.5f,  2.0f, -2.5f),
+		glm::vec3( 1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
 	// Object VAO
 	unsigned int VBO, cubeVAO;
 	glGenVertexArrays(1, &cubeVAO);
@@ -136,9 +150,11 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	LightSource light {
-		glm::vec3{ 1.2f, 1.0f, 2.0f },
+	Spotlight light {
+		glm::vec3{ 0.0f },
 		glm::vec3{ 1.0f },
+		12.5f,
+		17.5f,
 		glm::vec3{ 0.2f },
 		glm::vec3{ 0.5f },
 		glm::vec3{ 1.0f },
@@ -147,14 +163,13 @@ int main() {
 	Material material {
 		loadTexture("textures/container2.png"),
 		loadTexture("textures/container2_specular.png"),
-		loadTexture("textures/matrix.jpg"),
+		0,
 		32.0f
 	};
 
-	basic.use();
-	basic.set("material.diffuseMap", 0);
-	basic.set("material.specularMap", 1);
-	basic.set("material.emissionMap", 2);
+	cube.use();
+	cube.set("material.diffuseMap", 0);
+	cube.set("material.specularMap", 1);
 
 	// Render loop
 	while(!glfwWindowShouldClose(window)) {
@@ -168,24 +183,33 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Cube
-		basic.use();
-		basic.set("lightSource.ambientIntensity", light.ambientIntensity);
-		basic.set("lightSource.diffuseIntensity", light.diffuseIntensity);
-		basic.set("lightSource.specularIntensity", light.specularIntensity);
+		cube.use();
+		cube.set("lightSource.position", camera.position);
+		cube.set("lightSource.direction", camera.front);
+		cube.set("lightSource.innerCutOffAngle", glm::cos(glm::radians(light.innerCutOffAngle)));
+		cube.set("lightSource.outerCutOffAngle", glm::cos(glm::radians(light.outerCutOffAngle)));
+		cube.set("lightSource.ambientIntensity", light.ambientIntensity);
+		cube.set("lightSource.diffuseIntensity", light.diffuseIntensity);
+		cube.set("lightSource.specularIntensity", light.specularIntensity);
 
-		basic.set("material.shininess", material.shininess);
+		cube.set("material.shininess", material.shininess);
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), 800.0f / 600.0f, 0.1f, 100.0f);
-		basic.set("projection", projection);
+		cube.set("projection", projection);
 
 		glm::mat4 view = camera.getViewMatrix();
-		glm::vec3 worldLightPosition = glm::vec3(view * glm::vec4(light.position, 1.0f));
-		basic.set("lightSource.position", worldLightPosition);
-		basic.set("view", view);
+		cube.set("view", view);
+		cube.set("cameraPosition", camera.position);
 
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::rotate(model, glm::radians(20.0f * static_cast<float>(glfwGetTime())), glm::vec3{ 0.0f, 1.0f, 0.0f });
-		basic.set("model", model);
+		for(unsigned int i = 0; i < 10; i++) {
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			cube.set("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, material.diffuseMap);
@@ -193,23 +217,7 @@ int main() {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, material.specularMap);
 
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, material.emissionMap);
-
 		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		// Light Source
-		lightSource.use();
-		lightSource.set("projection", projection);
-		lightSource.set("view", view);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, light.position);
-		model = glm::scale(model, glm::vec3(0.2f));
-		lightSource.set("model", model);
-		lightSource.set("lightColor", light.color);
-
-		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);

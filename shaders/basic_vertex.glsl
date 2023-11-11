@@ -12,8 +12,9 @@ out vec3 normal;
 out vec3 fragmentPosition;
 
 void main() {
-	fragmentPosition = vec3(view * model * vec4(inPosition, 1.0));
-	normal = mat3(transpose(inverse(view * model))) * inNormal;
+	fragmentPosition = vec3(model * vec4(inPosition, 1.0));
+	normal = mat3(transpose(inverse(model))) * inNormal;
+
 	textureCoordinates = inTextureCoordinates;
 
 	gl_Position = projection * view * model * vec4(inPosition, 1.0);

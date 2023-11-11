@@ -150,14 +150,41 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	Spotlight light {
+	DirectionalLight directionalLight {
+		glm::vec3 { -0.2f, -1.0f, -0.3f },
+		glm::vec3 { 0.05f },
+		glm::vec3 { 0.4f },
+		glm::vec3 { 0.5f },
+	};
+
+	PointLight basePointLight {
+		glm::vec3 { 0.0f },
+		1.0f,
+		0.09f,
+		0.032f,
+		glm::vec3 { 0.05f },
+		glm::vec3 { 0.8f },
+		glm::vec3 { 1.0f },
+	};
+
+	std::vector<glm::vec3> pointLightsPositions {
+		glm::vec3( 0.7f,  0.2f,  2.0f),
+		glm::vec3( 2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3( 0.0f,  0.0f, -3.0f),
+	};
+
+	Spotlight flashlight {
 		glm::vec3{ 0.0f },
 		glm::vec3{ 1.0f },
 		12.5f,
 		17.5f,
-		glm::vec3{ 0.2f },
-		glm::vec3{ 0.5f },
-		glm::vec3{ 1.0f },
+		1.0f,
+		0.09f,
+		0.032f,
+		glm::vec3 { 0.0f },
+		glm::vec3 { 1.0f },
+		glm::vec3 { 1.0f },
 	};
 
 	Material material {
@@ -184,13 +211,31 @@ int main() {
 
 		// Cube
 		cube.use();
-		cube.set("lightSource.position", camera.position);
-		cube.set("lightSource.direction", camera.front);
-		cube.set("lightSource.innerCutOffAngle", glm::cos(glm::radians(light.innerCutOffAngle)));
-		cube.set("lightSource.outerCutOffAngle", glm::cos(glm::radians(light.outerCutOffAngle)));
-		cube.set("lightSource.ambientIntensity", light.ambientIntensity);
-		cube.set("lightSource.diffuseIntensity", light.diffuseIntensity);
-		cube.set("lightSource.specularIntensity", light.specularIntensity);
+		cube.set("directionalLight.direction", directionalLight.direction);
+		cube.set("directionalLight.ambientIntensity", directionalLight.ambientIntensity);
+		cube.set("directionalLight.diffuseIntensity", directionalLight.diffuseIntensity);
+		cube.set("directionalLight.specularIntensity", directionalLight.specularIntensity);
+
+		for (unsigned int i = 0; i < pointLightsPositions.size(); i++) {
+			cube.set("pointLights[" + std::to_string(i) + "].position", pointLightsPositions[i]);
+			cube.set("pointLights[" + std::to_string(i) + "].constant", basePointLight.constant);
+			cube.set("pointLights[" + std::to_string(i) + "].linear", basePointLight.linear);
+			cube.set("pointLights[" + std::to_string(i) + "].quadratic", basePointLight.quadratic);
+			cube.set("pointLights[" + std::to_string(i) + "].ambientIntensity", basePointLight.ambientIntensity);
+			cube.set("pointLights[" + std::to_string(i) + "].diffuseIntensity", basePointLight.diffuseIntensity);
+			cube.set("pointLights[" + std::to_string(i) + "].specularIntensity", basePointLight.specularIntensity);
+		}
+
+		cube.set("spotlight.position", camera.position);
+		cube.set("spotlight.direction", camera.front);
+		cube.set("spotlight.innerCutOffAngle", glm::cos(glm::radians(flashlight.innerCutOffAngle)));
+		cube.set("spotlight.outerCutOffAngle", glm::cos(glm::radians(flashlight.outerCutOffAngle)));
+		cube.set("spotlight.constant", flashlight.constant);
+		cube.set("spotlight.linear", flashlight.linear);
+		cube.set("spotlight.quadratic", flashlight.quadratic);
+		cube.set("spotlight.ambientIntensity", flashlight.ambientIntensity);
+		cube.set("spotlight.diffuseIntensity", flashlight.diffuseIntensity);
+		cube.set("spotlight.specularIntensity", flashlight.specularIntensity);
 
 		cube.set("material.shininess", material.shininess);
 

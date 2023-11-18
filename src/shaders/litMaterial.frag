@@ -8,7 +8,6 @@ struct DirectionalLight {
 	vec3 specularIntensity;
 };
 
-#define N_POINT_LIGHTS 4
 struct PointLight {
 	vec3 position;
 
@@ -50,7 +49,7 @@ in vec3 fragmentPosition;
 uniform vec3 cameraPosition;
 uniform Material material;
 uniform DirectionalLight directionalLight;
-uniform PointLight pointLights[N_POINT_LIGHTS];
+uniform PointLight pointLight;
 uniform Spotlight spotlight;
 
 out vec4 outColor;
@@ -64,8 +63,7 @@ void main() {
 	vec3 viewDirection = normalize(cameraPosition - fragmentPosition);
 
 	vec3 result = calculateDirectionalLight(directionalLight, norm, viewDirection);
-	for (int i = 0; i < N_POINT_LIGHTS; i++)
-		result += calculatePointLight(pointLights[i], norm, fragmentPosition, viewDirection);
+	result += calculatePointLight(pointLight, norm, fragmentPosition, viewDirection);
 	result += calculateSpotlight(spotlight, normal, fragmentPosition, viewDirection);
 
 	outColor = vec4(result, 1.0f);

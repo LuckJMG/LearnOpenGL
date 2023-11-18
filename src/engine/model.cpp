@@ -8,7 +8,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "../shader/shader.h"
+#include "shader.hpp"
 #include "mesh.hpp"
 #include "model.hpp"
 

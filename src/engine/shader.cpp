@@ -5,7 +5,7 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include "shader.h"
+#include "shader.hpp"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 	std::string vertexRawCode = Shader::getSourceCode(vertexPath);

@@ -7,9 +7,9 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec2 textureCoordinates;
 out vec3 normal;
 out vec3 fragmentPosition;
+out vec2 textureCoordinates;
 
 void main() {
 	fragmentPosition = vec3(model * vec4(inPosition, 1.0));

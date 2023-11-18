@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 
-#include "../shader/shader.h"
+#include "shader.hpp"
 
 #define MAX_BONE_INFLUENCE 4
 

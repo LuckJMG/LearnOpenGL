@@ -93,11 +93,14 @@ int main() {
 		unlitMaterial.set("view", view);
 		unlitMaterial.set("projection", projection);
 
-		cube1.rotate(glm::vec3 { cube1.getRotation().x + deltaTime, 0.0f, 0.0f });
+		cube1.translate(glm::vec3 { -1.0f, 0.0f, -1.0f });
+		cube1.rotate(glm::vec3 { cube1.getRotation().x + deltaTime, cube1.getRotation().y + 2 * deltaTime, 0.0f });
 		cube1.draw();
 
+		cube2.translate(glm::vec3 { 2.0f, 0.0f, 0.0f });
 		cube2.draw();
 
+		sphere.translate(glm::vec3 { 0.0f, 5.0f, 0.0f });
 		sphere.draw();
 
 		glfwSwapBuffers(window);

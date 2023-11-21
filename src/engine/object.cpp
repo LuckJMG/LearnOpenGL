@@ -13,7 +13,7 @@ Object::Object(Model model, Shader shader):
 void Object::translate(glm::vec3 position) {
 	shader.use();
 
-	modelMatrix = glm::translate(modelMatrix, position);
+	modelMatrix[3] = glm::vec4{ position, 1.0f };
 	shader.set("model", modelMatrix);
 
 	this->position = position;
@@ -22,9 +22,29 @@ void Object::translate(glm::vec3 position) {
 void Object::rotate(glm::vec3 rotation) {
 	shader.use();
 
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), glm::vec3 { 1.0f, 0.0f, 0.0f });
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), glm::vec3 { 0.0f, 1.0f, 0.0f });
-	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), glm::vec3 { 0.0f, 0.0f, 1.0f });
+	glm::mat4 xRotation { 1.0f };
+	xRotation[1][1] = cos(rotation.x);
+	xRotation[1][2] = sin(rotation.x);
+	xRotation[2][1] = -sin(rotation.x);
+	xRotation[2][2] = cos(rotation.x);
+
+	glm::mat4 yRotation { 1.0f };
+	yRotation[0][0] = cos(rotation.y);
+	yRotation[0][2] = sin(rotation.y);
+	yRotation[2][0] = -sin(rotation.y);
+	yRotation[2][2] = cos(rotation.y);
+
+	glm::mat4 zRotation { 1.0f };
+	zRotation[0][0] = cos(rotation.z);
+	zRotation[0][1] = sin(rotation.z);
+	zRotation[1][0] = -sin(rotation.z);
+	zRotation[1][1] = cos(rotation.z);
+
+	glm::mat4 rotationMatrix = zRotation * yRotation * xRotation;
+	modelMatrix[0] = rotationMatrix[0];
+	modelMatrix[1] = rotationMatrix[1];
+	modelMatrix[2] = rotationMatrix[2];
+
 	shader.set("model", modelMatrix);
 
 	this->rotation = rotation;

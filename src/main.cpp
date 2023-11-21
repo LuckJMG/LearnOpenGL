@@ -101,6 +101,7 @@ int main() {
 		cube2.draw();
 
 		sphere.translate(glm::vec3 { 0.0f, 5.0f, 0.0f });
+		sphere.rotate(glm::vec3 { sphere.getRotation().x + deltaTime, sphere.getRotation().y + 2 * deltaTime, 0.0f });
 		sphere.draw();
 
 		glfwSwapBuffers(window);

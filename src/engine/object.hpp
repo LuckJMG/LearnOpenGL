@@ -8,22 +8,16 @@
 
 class Object {
 	public:
+		glm::vec3 position;
+		glm::vec3 rotation;
+		glm::vec3 scale;
+
 		Object(Model model, Shader shader);
-
-		glm::vec3 getPosition() { return this->position; }
-		glm::vec3 getRotation() { return this->rotation; }
-
-		void draw() { this->model.draw(this->shader); }
-		void translate(glm::vec3 position);
-		void rotate(glm::vec3 rotation);
+		void draw();
 
 	private:
 		Model model;
 		Shader shader;
-
-		glm::mat4 modelMatrix;
-		glm::vec3 position;
-		glm::vec3 rotation;
 };
 
 #endif

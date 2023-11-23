@@ -63,20 +63,38 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	Shader unlitMaterial { "src/shaders/model.vert", "src/shaders/unlitMaterial.frag" };
+	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
+	Shader litColor { "src/shaders/model.vert", "src/shaders/litColor.frag" };
 	Model cubeModel { "src/models/cube.obj" };
 	Model sphereModel { "src/models/sphere.obj" };
 
-	Object cube1 { cubeModel, unlitMaterial };
-	Object cube2 { cubeModel, unlitMaterial };
-	Object sphere { sphereModel, unlitMaterial };
+	Object cube { cubeModel, litColor };
+	Object torch { sphereModel, unlitColor };
 
-	unsigned int poggers = loadTexture("src/textures/disco_poggers.jpg");
+	DirectionalLight directionalLight {
+		glm::vec3 { -0.2f, -1.0f, -0.3f },
 
-	unlitMaterial.use();
-	unlitMaterial.set("diffuseMap1", 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, poggers);
+		glm::vec3 { 0.05f, 0.05f, 0.05f },
+		glm::vec3 { 0.4f, 0.4f, 0.4f },
+		glm::vec3 { 0.5f, 0.5f, 0.5f },
+	};
+
+	litColor.use();
+	glm::vec3 color { 0.4f, 0.6f, 0.2f };
+	litColor.set("material.color", color);
+	litColor.set("material.shininess", 32);
+
+	litColor.set("directionalLight.direction", directionalLight.direction);
+	litColor.set("directionalLight.ambientIntensity", directionalLight.ambientIntensity);
+	litColor.set("directionalLight.diffuseIntensity", directionalLight.diffuseIntensity);
+	litColor.set("directionalLight.specularIntensity", directionalLight.specularIntensity);
+
+	unlitColor.use();
+	glm::vec3 lightColor { 1.0f };
+	unlitColor.set("color", lightColor);
+
+	cube.position = glm::vec3 { -1.0f, 0.0f, -3.0f };
+	cube.scale = glm::vec3 { 2.0f, 1.0f, 3.0f };
 
 	while(!glfwWindowShouldClose(window)) {
 		float currentFrame = static_cast<float>(glfwGetTime());
@@ -85,24 +103,21 @@ int main() {
 
 		processInput(window);
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.7f, 0.9f, 0.85f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-		unlitMaterial.set("view", view);
-		unlitMaterial.set("projection", projection);
+		litColor.use();
+		litColor.set("view", view);
+		litColor.set("projection", projection);
 
-		cube1.translate(glm::vec3 { -1.0f, 0.0f, -1.0f });
-		cube1.rotate(glm::vec3 { cube1.getRotation().x + deltaTime, cube1.getRotation().y + 2 * deltaTime, 0.0f });
-		cube1.draw();
+		unlitColor.use();
+		unlitColor.set("view", view);
+		unlitColor.set("projection", projection);
 
-		cube2.translate(glm::vec3 { 2.0f, 0.0f, 0.0f });
-		cube2.draw();
-
-		sphere.translate(glm::vec3 { 0.0f, 5.0f, 0.0f });
-		sphere.rotate(glm::vec3 { sphere.getRotation().x + deltaTime, sphere.getRotation().y + 2 * deltaTime, 0.0f });
-		sphere.draw();
+		cube.rotation = glm::vec3 { cube.rotation.x + deltaTime, 0.0f, 0.0f };
+		cube.draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

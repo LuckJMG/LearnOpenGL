@@ -1,5 +1,7 @@
 #version 330 core
 
+#define MAX_LIGHTS 128
+
 struct DirectionalLight {
 	vec3 direction;
 
@@ -48,9 +50,14 @@ in vec3 fragmentPosition;
 
 uniform vec3 cameraPosition;
 uniform Material material;
+
 uniform DirectionalLight directionalLight;
-uniform PointLight pointLight;
-uniform Spotlight spotlight;
+
+uniform int pointLightsAmount;
+uniform PointLight pointLights[MAX_LIGHTS];
+
+uniform int spotlightsAmount;
+uniform Spotlight spotlights[MAX_LIGHTS];
 
 out vec4 outColor;
 
@@ -63,8 +70,14 @@ void main() {
 	vec3 viewDirection = normalize(cameraPosition - fragmentPosition);
 
 	vec3 result = calculateDirectionalLight(directionalLight, norm, viewDirection);
-	result += calculatePointLight(pointLight, norm, fragmentPosition, viewDirection);
-	result += calculateSpotlight(spotlight, normal, fragmentPosition, viewDirection);
+
+	for (int i = 0; i < pointLightsAmount; i++) {
+		result += calculatePointLight(pointLights[i], norm, fragmentPosition, viewDirection);
+	}
+
+	for (int i = 0; i < spotlightsAmount; i++) {
+		result += calculateSpotlight(spotlights[i], normal, fragmentPosition, viewDirection);
+	}
 
 	outColor = vec4(result, 1.0f);
 }

@@ -53,10 +53,10 @@ uniform ColorMaterial material;
 
 uniform DirectionalLight directionalLight;
 
-uniform int pointLightsAmount;
+uniform int pointLightsAmount = 0;
 uniform PointLight pointLights[MAX_LIGHTS];
 
-uniform int spotlightsAmount;
+uniform int spotlightsAmount = 0;
 uniform Spotlight spotlights[MAX_LIGHTS];
 
 out vec4 outColor;
@@ -71,6 +71,7 @@ void main() {
 
 	vec3 result = calculateDirectionalLight(directionalLight, norm, viewDirection);
 
+/*
 	for (int i = 0; i < pointLightsAmount; i++) {
 		result += calculatePointLight(pointLights[i], norm, fragmentPosition, viewDirection);
 	}
@@ -78,6 +79,7 @@ void main() {
 	for (int i = 0; i < spotlightsAmount; i++) {
 		result += calculateSpotlight(spotlights[i], normal, fragmentPosition, viewDirection);
 	}
+*/
 
 	outColor = vec4(result, 1.0f);
 }

@@ -63,38 +63,19 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
-	Shader litColor { "src/shaders/model.vert", "src/shaders/litColor.frag" };
+	Shader litColor { "src/shaders/model.vert", "src/shaders/test.frag" };
 	Model cubeModel { "src/models/cube.obj" };
-	Model sphereModel { "src/models/sphere.obj" };
 
 	Object cube { cubeModel, litColor };
-	Object torch { sphereModel, unlitColor };
 
 	DirectionalLight directionalLight {
 		glm::vec3 { -0.2f, -1.0f, -0.3f },
-
-		glm::vec3 { 0.05f, 0.05f, 0.05f },
-		glm::vec3 { 0.4f, 0.4f, 0.4f },
-		glm::vec3 { 0.5f, 0.5f, 0.5f },
+		glm::vec3 { 0.2f },
+		glm::vec3 { 0.5f },
+		glm::vec3 { 1.0f },
 	};
 
-	litColor.use();
-	glm::vec3 color { 0.4f, 0.6f, 0.2f };
-	litColor.set("material.color", color);
-	litColor.set("material.shininess", 32);
-
-	litColor.set("directionalLight.direction", directionalLight.direction);
-	litColor.set("directionalLight.ambientIntensity", directionalLight.ambientIntensity);
-	litColor.set("directionalLight.diffuseIntensity", directionalLight.diffuseIntensity);
-	litColor.set("directionalLight.specularIntensity", directionalLight.specularIntensity);
-
-	unlitColor.use();
-	glm::vec3 lightColor { 1.0f };
-	unlitColor.set("color", lightColor);
-
-	cube.position = glm::vec3 { -1.0f, 0.0f, -3.0f };
-	cube.scale = glm::vec3 { 2.0f, 1.0f, 3.0f };
+	glm::vec3 color = glm::vec3 { 1.0f, 0.0f, 0.0f };
 
 	while(!glfwWindowShouldClose(window)) {
 		float currentFrame = static_cast<float>(glfwGetTime());
@@ -103,20 +84,26 @@ int main() {
 
 		processInput(window);
 
-		glClearColor(0.7f, 0.9f, 0.85f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+
 		litColor.use();
 		litColor.set("view", view);
 		litColor.set("projection", projection);
 
-		unlitColor.use();
-		unlitColor.set("view", view);
-		unlitColor.set("projection", projection);
+		litColor.set("viewPos", camera.position);
+		
+		litColor.set("light.direction", directionalLight.direction);
+		litColor.set("light.ambient", directionalLight.ambientIntensity);
+		litColor.set("light.diffuse", directionalLight.diffuseIntensity);
+		litColor.set("light.specular", directionalLight.specularIntensity);
 
-		cube.rotation = glm::vec3 { cube.rotation.x + deltaTime, 0.0f, 0.0f };
+		litColor.set("material.color", color);
+		litColor.set("material.shininess", 32.0f);
+
 		cube.draw();
 
 		glfwSwapBuffers(window);

@@ -43,9 +43,9 @@ struct ColorMaterial {
 	float shininess;
 };
 
-in vec2 textureCoordinates;
 in vec3 normal;
 in vec3 fragmentPosition;
+in vec2 textureCoordinates;
 
 uniform vec3 cameraPosition;
 
@@ -71,7 +71,6 @@ void main() {
 
 	vec3 result = calculateDirectionalLight(directionalLight, norm, viewDirection);
 
-/*
 	for (int i = 0; i < pointLightsAmount; i++) {
 		result += calculatePointLight(pointLights[i], norm, fragmentPosition, viewDirection);
 	}
@@ -79,51 +78,51 @@ void main() {
 	for (int i = 0; i < spotlightsAmount; i++) {
 		result += calculateSpotlight(spotlights[i], normal, fragmentPosition, viewDirection);
 	}
-*/
 
 	outColor = vec4(result, 1.0f);
 }
 
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 cameraDirection) {
-	vec3 lightDirection = normalize(-light.direction);
+	vec3 ambientLight = light.ambientIntensity * material.color;
 
+	vec3 lightDirection = normalize(-light.direction);
 	float diffuseIntensity = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * material.color;
 
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularIntensity = pow(max(dot(cameraDirection, reflectDirection), 0.0f), material.shininess);
-	
-	vec3 ambientLight = light.ambientIntensity * material.color;
-	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * material.color;
 	vec3 specularLight = light.specularIntensity * specularIntensity * material.color;
 
 	return ambientLight + diffuseLight + specularLight;
 }
 
 vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 cameraDirection) {
-	vec3 lightDirection = normalize(fragmentPosition - light.position);
+	vec3 ambientLight = light.ambientIntensity * material.color;
 
+	vec3 lightDirection = normalize(light.position - fragmentPosition);
 	float diffuseIntensity = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * material.color;
 
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularIntensity = pow(max(dot(cameraDirection, reflectDirection), 0.0f), material.shininess);
+	vec3 specularLight = light.specularIntensity * specularIntensity * material.color;
 
 	float distance = length(fragmentPosition - light.position);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * pow(distance, 2));
-
-	vec3 ambientLight = light.ambientIntensity * material.color;
-	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * material.color;
-	vec3 specularLight = light.specularIntensity * specularIntensity * material.color;
 
 	return attenuation * (ambientLight + diffuseLight + specularLight);
 }
 
 vec3 calculateSpotlight(Spotlight light, vec3 normal, vec3 fragmentPosition, vec3 cameraDirection) {
-	vec3 lightDirection = normalize(light.position - fragmentPosition);
+	vec3 ambientLight = light.ambientIntensity * material.color;
 
+	vec3 lightDirection = normalize(light.position - fragmentPosition);
 	float diffuseIntensity = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * material.color;
 
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularIntensity = pow(max(dot(cameraDirection, reflectDirection), 0.0), material.shininess);
+	vec3 specularLight = light.specularIntensity * specularIntensity * material.color;
 
 	float distance = length(light.position - fragmentPosition);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * pow(distance, 2));
@@ -131,10 +130,6 @@ vec3 calculateSpotlight(Spotlight light, vec3 normal, vec3 fragmentPosition, vec
 	float theta = dot(lightDirection, normalize(-light.direction));
 	float epsilon = light.innerCutOffAngle - light.outerCutOffAngle;
 	float intensity = clamp((theta - light.outerCutOffAngle) / epsilon, 0.0f, 1.0f);
-
-	vec3 ambientLight = light.ambientIntensity * material.color;
-	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * material.color;
-	vec3 specularLight = light.specularIntensity * specularIntensity * material.color;
 
 	return intensity * attenuation * (ambientLight + diffuseLight + specularLight);
 }

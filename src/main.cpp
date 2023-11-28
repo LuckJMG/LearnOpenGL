@@ -63,10 +63,13 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	Shader litColor { "src/shaders/model.vert", "src/shaders/test.frag" };
+	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
+	Shader litColor { "src/shaders/model.vert", "src/shaders/litColor.frag" };
 	Model cubeModel { "src/models/cube.obj" };
+	Model sphereModel { "src/models/sphere.obj" };
 
 	Object cube { cubeModel, litColor };
+	Object sphere { sphereModel, unlitColor };
 
 	DirectionalLight directionalLight {
 		glm::vec3 { -0.2f, -1.0f, -0.3f },
@@ -75,7 +78,41 @@ int main() {
 		glm::vec3 { 1.0f },
 	};
 
+	PointLight pointLight {
+		glm::vec3 { -3.0f, 3.0f, -1.0f },
+		1.0f,
+		0.09f,
+		0.032f,
+		glm::vec3 { 0.2f },
+		glm::vec3 { 0.5f },
+		glm::vec3 { 1.0f }
+	};
+
 	glm::vec3 color = glm::vec3 { 1.0f, 0.0f, 0.0f };
+
+	glm::vec3 lightColor = glm::vec3 { 1.0f };
+	unlitColor.use();
+	unlitColor.set("color", lightColor);
+	sphere.position = glm::vec3 { -3.0f, 3.0f, -1.0f };
+	sphere.scale = glm::vec3 { 0.25f };
+
+	litColor.use();
+	litColor.set("directionalLight.direction", directionalLight.direction);
+	litColor.set("directionalLight.ambientIntensity", directionalLight.ambientIntensity);
+	litColor.set("directionalLight.diffuseIntensity", directionalLight.diffuseIntensity);
+	litColor.set("directionalLight.specularIntensity", directionalLight.specularIntensity);
+
+	litColor.set("pointLightsAmount", 1);
+	litColor.set("pointLights[0].position", pointLight.position);
+	litColor.set("pointLights[0].constant", pointLight.constant);
+	litColor.set("pointLights[0].linear", pointLight.linear);
+	litColor.set("pointLights[0].quadratic", pointLight.quadratic);
+	litColor.set("pointLights[0].ambientIntensity", pointLight.ambientIntensity);
+	litColor.set("pointLights[0].diffuseIntensity", pointLight.diffuseIntensity);
+	litColor.set("pointLights[0].specularIntensity", pointLight.specularIntensity);
+
+	litColor.set("material.color", color);
+	litColor.set("material.shininess", 32.0f);
 
 	while(!glfwWindowShouldClose(window)) {
 		float currentFrame = static_cast<float>(glfwGetTime());
@@ -93,18 +130,14 @@ int main() {
 		litColor.use();
 		litColor.set("view", view);
 		litColor.set("projection", projection);
+		litColor.set("cameraPosition", camera.position);
 
-		litColor.set("viewPos", camera.position);
-		
-		litColor.set("light.direction", directionalLight.direction);
-		litColor.set("light.ambient", directionalLight.ambientIntensity);
-		litColor.set("light.diffuse", directionalLight.diffuseIntensity);
-		litColor.set("light.specular", directionalLight.specularIntensity);
-
-		litColor.set("material.color", color);
-		litColor.set("material.shininess", 32.0f);
+		unlitColor.use();
+		unlitColor.set("view", view);
+		unlitColor.set("projection", projection);
 
 		cube.draw();
+		sphere.draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -51,12 +51,17 @@ in vec3 fragmentPosition;
 uniform vec3 cameraPosition;
 uniform Material material;
 
-uniform DirectionalLight directionalLight;
+uniform DirectionalLight directionalLight = DirectionalLight(
+	vec3(0.0f),
+	vec3(0.0f),
+	vec3(0.0f),
+	vec3(0.0f)
+);
 
-uniform int pointLightsAmount;
+uniform int pointLightsAmount = 0;
 uniform PointLight pointLights[MAX_LIGHTS];
 
-uniform int spotlightsAmount;
+uniform int spotlightsAmount = 0;
 uniform Spotlight spotlights[MAX_LIGHTS];
 
 out vec4 outColor;
@@ -83,45 +88,46 @@ void main() {
 }
 
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 cameraDirection) {
-	vec3 lightDirection = normalize(-light.direction);
+	vec3 ambientLight = light.ambientIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
 
+	vec3 lightDirection = normalize(-light.direction);
 	float diffuseIntensity = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
 
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularIntensity = pow(max(dot(cameraDirection, reflectDirection), 0.0f), material.shininess);
-	
-	vec3 ambientLight = light.ambientIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
-	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
 	vec3 specularLight = light.specularIntensity * specularIntensity * vec3(texture(material.specularMap, textureCoordinates));
-
+	
 	return ambientLight + diffuseLight + specularLight;
 }
 
 vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 cameraDirection) {
-	vec3 lightDirection = normalize(fragmentPosition - light.position);
+	vec3 ambientLight = light.ambientIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
 
+	vec3 lightDirection = normalize(light.position - fragmentPosition);
 	float diffuseIntensity = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
 
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularIntensity = pow(max(dot(cameraDirection, reflectDirection), 0.0f), material.shininess);
+	vec3 specularLight = light.specularIntensity * specularIntensity * vec3(texture(material.specularMap, textureCoordinates));
 
 	float distance = length(fragmentPosition - light.position);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * pow(distance, 2));
-
-	vec3 ambientLight = light.ambientIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
-	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
-	vec3 specularLight = light.specularIntensity * specularIntensity * vec3(texture(material.specularMap, textureCoordinates));
 
 	return attenuation * (ambientLight + diffuseLight + specularLight);
 }
 
 vec3 calculateSpotlight(Spotlight light, vec3 normal, vec3 fragmentPosition, vec3 cameraDirection) {
-	vec3 lightDirection = normalize(light.position - fragmentPosition);
+	vec3 ambientLight = light.ambientIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
 
+	vec3 lightDirection = normalize(light.position - fragmentPosition);
 	float diffuseIntensity = max(dot(normal, lightDirection), 0.0f);
+	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
 
 	vec3 reflectDirection = reflect(-lightDirection, normal);
 	float specularIntensity = pow(max(dot(cameraDirection, reflectDirection), 0.0), material.shininess);
+	vec3 specularLight = light.specularIntensity * specularIntensity * vec3(texture(material.specularMap, textureCoordinates));
 
 	float distance = length(light.position - fragmentPosition);
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * pow(distance, 2));
@@ -129,10 +135,6 @@ vec3 calculateSpotlight(Spotlight light, vec3 normal, vec3 fragmentPosition, vec
 	float theta = dot(lightDirection, normalize(-light.direction));
 	float epsilon = light.innerCutOffAngle - light.outerCutOffAngle;
 	float intensity = clamp((theta - light.outerCutOffAngle) / epsilon, 0.0f, 1.0f);
-
-	vec3 ambientLight = light.ambientIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
-	vec3 diffuseLight = light.diffuseIntensity * diffuseIntensity * vec3(texture(material.diffuseMap, textureCoordinates));
-	vec3 specularLight = light.specularIntensity * specularIntensity * vec3(texture(material.specularMap, textureCoordinates));
 
 	return intensity * attenuation * (ambientLight + diffuseLight + specularLight);
 }

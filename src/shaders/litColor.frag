@@ -51,7 +51,12 @@ uniform vec3 cameraPosition;
 
 uniform ColorMaterial material;
 
-uniform DirectionalLight directionalLight;
+uniform DirectionalLight directionalLight = DirectionalLight(
+	vec3(0.0f),
+	vec3(0.0f),
+	vec3(0.0f),
+	vec3(0.0f)
+);
 
 uniform int pointLightsAmount = 0;
 uniform PointLight pointLights[MAX_LIGHTS];

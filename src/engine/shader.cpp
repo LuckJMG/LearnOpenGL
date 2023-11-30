@@ -35,47 +35,57 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 	glDeleteShader(fragment);
 }
 
-void Shader::use() {
+void Shader::use() const {
 	glUseProgram(ID);
 }
 
 void Shader::set(const std::string &name, bool value) const {
+	use();
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), static_cast<int>(value));
 }
 
 void Shader::set(const std::string &name, int value) const {
+	use();
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
 void Shader::set(const std::string &name, unsigned int value) const {
+	use();
 	glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
 }
 
 void Shader::set(const std::string &name, float value) const {
+	use();
 	glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
 
 void Shader::set(const std::string &name, glm::vec2 &vector) const {
+	use();
 	glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &vector[0]);
 }
 
 void Shader::set(const std::string &name, glm::vec3 &vector) const {
+	use();
 	glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &vector[0]);
 }
 
 void Shader::set(const std::string &name, glm::vec4 &vector) const {
+	use();
 	glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &vector[0]);
 }
 
 void Shader::set(const std::string &name, glm::mat2 &matrix) const {
+	use();
 	glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &matrix[0][0]);
 }
 
 void Shader::set(const std::string &name, glm::mat3 &matrix) const {
+	use();
 	glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &matrix[0][0]);
 }
 
 void Shader::set(const std::string &name, glm::mat4 &matrix) const {
+	use();
 	glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &matrix[0][0]);
 }
 

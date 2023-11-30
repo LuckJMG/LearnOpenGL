@@ -21,7 +21,6 @@
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);  
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
-unsigned int loadTexture(char const* path);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float deltaTime { 0.0f };
@@ -36,13 +35,11 @@ unsigned int SCREEN_WIDTH = 800;
 unsigned int SCREEN_HEIGHT = 600;
 
 int main() {
-	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Create window object
 	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", NULL, NULL);
 	if (window == NULL) {
 		std::cerr << "Failed to create GLFW window" << std::endl;
@@ -53,7 +50,6 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 
-	// Check glad
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
@@ -69,14 +65,8 @@ int main() {
 	Model sphereModel { "src/models/sphere.obj" };
 
 	Object cube { cubeModel, litColor };
-	Object sphere { sphereModel, unlitColor };
-
-	DirectionalLight directionalLight {
-		glm::vec3 { -0.2f, -1.0f, -0.3f },
-		glm::vec3 { 0.2f },
-		glm::vec3 { 0.5f },
-		glm::vec3 { 1.0f },
-	};
+	Object sphere { sphereModel, litColor };
+	Object torch { sphereModel, unlitColor };
 
 	PointLight pointLight {
 		glm::vec3 { -3.0f, 3.0f, -1.0f },
@@ -89,21 +79,14 @@ int main() {
 	};
 
 	glm::vec3 color = glm::vec3 { 1.0f, 0.0f, 0.0f };
+	glm::vec3 color2 = glm::vec3 { 0.0f, 1.0f, 0.0f };
 
 	glm::vec3 lightColor = glm::vec3 { 1.0f };
-	unlitColor.use();
 	unlitColor.set("color", lightColor);
-	sphere.position = glm::vec3 { -3.0f, 3.0f, -1.0f };
-	sphere.scale = glm::vec3 { 0.25f };
-
-	litColor.use();
-	litColor.set("directionalLight.direction", directionalLight.direction);
-	litColor.set("directionalLight.ambientIntensity", directionalLight.ambientIntensity);
-	litColor.set("directionalLight.diffuseIntensity", directionalLight.diffuseIntensity);
-	litColor.set("directionalLight.specularIntensity", directionalLight.specularIntensity);
+	torch.position = glm::vec3 { -3.0f, 3.0f, -1.0f };
+	torch.scale = glm::vec3 { 0.25f };
 
 	litColor.set("pointLightsAmount", 1);
-	litColor.set("pointLights[0].position", pointLight.position);
 	litColor.set("pointLights[0].constant", pointLight.constant);
 	litColor.set("pointLights[0].linear", pointLight.linear);
 	litColor.set("pointLights[0].quadratic", pointLight.quadratic);
@@ -111,8 +94,7 @@ int main() {
 	litColor.set("pointLights[0].diffuseIntensity", pointLight.diffuseIntensity);
 	litColor.set("pointLights[0].specularIntensity", pointLight.specularIntensity);
 
-	litColor.set("material.color", color);
-	litColor.set("material.shininess", 32.0f);
+	sphere.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
 
 	while(!glfwWindowShouldClose(window)) {
 		float currentFrame = static_cast<float>(glfwGetTime());
@@ -126,18 +108,26 @@ int main() {
 
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+		torch.position.z += sin(deltaTime);
 
-		litColor.use();
 		litColor.set("view", view);
 		litColor.set("projection", projection);
 		litColor.set("cameraPosition", camera.position);
+		litColor.set("pointLights[0].position", torch.position);
 
-		unlitColor.use();
 		unlitColor.set("view", view);
 		unlitColor.set("projection", projection);
 
+		litColor.set("material.color", color);
+		litColor.set("material.shininess", 32.0f);
 		cube.draw();
+
+		litColor.set("material.color", color2);
+		litColor.set("material.shininess", 256.0f);
 		sphere.draw();
+
+		torch.position.z = -1.0f + sin(currentFrame);
+		torch.draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -182,36 +172,3 @@ void processInput(GLFWwindow* window) {
 		camera.processArrows(CameraMovement::down, deltaTime);
 }
 
-unsigned int loadTexture(char const* path) {
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-
-	int width, height, nrComponents;
-	unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-	if (data) {
-		GLenum format = GL_RGB;
-		if (nrComponents == 1)
-			format = GL_RED;
-		else if (nrComponents == 3)
-			format = GL_RGB;
-		else if (nrComponents == 4)
-			format = GL_RGBA;
-
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_image_free(data);
-	}
-	else {
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		stbi_image_free(data);
-	}
-
-	return textureID;
-}

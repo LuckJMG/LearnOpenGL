@@ -15,7 +15,6 @@ class Window {
 		int getWidth() { return width; }
 		int getHeight() { return height; }
 	
-		void resize(int width, int height);
 		void update();
 	
 	private:

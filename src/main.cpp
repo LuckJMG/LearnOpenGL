@@ -22,24 +22,11 @@
 #include "engine/objects/lightSource.h"
 #include "engine/objects/object.hpp"
 
-// void framebufferSizeCallback(GLFWwindow* window, int width, int height);  
-// void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, float deltaTime);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-float deltaTime { 0.0f };
-float lastFrame { 0.0f };
-
-unsigned int SCREEN_WIDTH = 800;
-unsigned int SCREEN_HEIGHT = 600;
 
 int main() {
-	/*
-	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-	glfwSetScrollCallback(window, scrollCallback);
-
-	GLFWwindow* window = createWindow(800, 600, "LearnOpenGL");
-	*/
 	Window window = Engine::start(800, 600, "LearnOpenGL");
 
 	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
@@ -80,18 +67,14 @@ int main() {
 	sphere.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
 
 	while(!glfwWindowShouldClose(window.getID())) {
-		float currentFrame = static_cast<float>(glfwGetTime());
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		processInput(window.getID());
+		processInput(window.getID(), window.deltaTime);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 view = camera.getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-		torch.position.z += sin(deltaTime);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), static_cast<float>(window.getWidth()) / window.getHeight(), 0.1f, 100.0f);
+		torch.position.z += sin(window.deltaTime);
 
 		litColor.set("view", view);
 		litColor.set("projection", projection);
@@ -109,28 +92,17 @@ int main() {
 		litColor.set("material.shininess", 256.0f);
 		sphere.draw();
 
-		torch.position.z = -1.0f + sin(currentFrame);
+		torch.position.z = -1.0f + sin(window.time);
 		torch.draw();
 
-		glfwSwapBuffers(window.getID());
-		glfwPollEvents();
+		window.update();
 	}
 
 	Engine::stop();
 	return 0;
 }
 
-/*
-void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
-	glViewport(0, 0, width, height);
-} 
-
-void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
-	camera.processMouseScroll(yOffset);
-}
-*/
-
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, float deltaTime) {
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 

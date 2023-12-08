@@ -3,8 +3,8 @@
 
 #include <glm/glm.hpp>
 
-#include "shader.hpp"
-#include "model.hpp"
+#include "../components/shader.hpp"
+#include "../components/model.hpp"
 
 class Object {
 	public:

@@ -1,8 +1,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "model.hpp"
-#include "shader.hpp"
+#include "../components/shader.hpp"
+#include "../components/model.hpp"
 
 #include "object.hpp"
 

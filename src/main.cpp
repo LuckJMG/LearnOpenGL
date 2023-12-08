@@ -1,22 +1,24 @@
 #include <iostream>
 #include <cmath>
-#include <vector>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "engine/shader.hpp"
-#include "engine/camera.hpp"
-#include "engine/lightSource.h"
-#include "engine/model.hpp"
-#include "engine/object.hpp"
+#include "engine/engine.c"
+#include "engine/utils/debug.hpp"
+
+#include "engine/components/shader.hpp"
+#include "engine/components/model.hpp"
+
+#include "engine/objects/camera.hpp"
+#include "engine/objects/lightSource.h"
+#include "engine/objects/object.hpp"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);  
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
@@ -26,38 +28,16 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float deltaTime { 0.0f };
 float lastFrame { 0.0f };
 
-std::ostream& operator<< (std::ostream& out, const glm::vec3& vector) {
-	out << "(" << vector.x << ", " << vector.y << ", " << vector.z << ')';
-	return out;
-}
-
 unsigned int SCREEN_WIDTH = 800;
 unsigned int SCREEN_HEIGHT = 600;
 
 int main() {
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LearnOpenGL", NULL, NULL);
-	if (window == NULL) {
-		std::cerr << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
+	/*
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetScrollCallback(window, scrollCallback);
+	*/
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	stbi_set_flip_vertically_on_load(true);
-
-	glEnable(GL_DEPTH_TEST);
+	GLFWwindow* window = createWindow(800, 600, "LearnOpenGL");
 
 	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
 	Shader litColor { "src/shaders/model.vert", "src/shaders/litColor.frag" };

@@ -11,6 +11,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "engine/engine.c"
+#include "engine/engine.hpp"
+#include "engine/window.hpp"
 #include "engine/utils/debug.hpp"
 
 #include "engine/components/shader.hpp"
@@ -20,8 +22,8 @@
 #include "engine/objects/lightSource.h"
 #include "engine/objects/object.hpp"
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);  
-void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+// void framebufferSizeCallback(GLFWwindow* window, int width, int height);  
+// void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void processInput(GLFWwindow* window);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -35,9 +37,10 @@ int main() {
 	/*
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetScrollCallback(window, scrollCallback);
-	*/
 
 	GLFWwindow* window = createWindow(800, 600, "LearnOpenGL");
+	*/
+	Window window = Engine::start(800, 600, "LearnOpenGL");
 
 	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
 	Shader litColor { "src/shaders/model.vert", "src/shaders/litColor.frag" };
@@ -76,12 +79,12 @@ int main() {
 
 	sphere.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
 
-	while(!glfwWindowShouldClose(window)) {
+	while(!glfwWindowShouldClose(window.getID())) {
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		processInput(window);
+		processInput(window.getID());
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -109,14 +112,15 @@ int main() {
 		torch.position.z = -1.0f + sin(currentFrame);
 		torch.draw();
 
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(window.getID());
 		glfwPollEvents();
 	}
 
-	glfwTerminate();
+	Engine::stop();
 	return 0;
 }
 
+/*
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 } 
@@ -124,6 +128,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) {
 	camera.processMouseScroll(yOffset);
 }
+*/
 
 void processInput(GLFWwindow* window) {
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)

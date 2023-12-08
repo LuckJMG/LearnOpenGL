@@ -6,25 +6,23 @@
 
 class Window {
 	public:
-		Window(int width, int height, const char title[]);
-		~Window();
+		Window(GLFWwindow* ID, int width, int height);
 
-		GLFWwindow* ID;
+		float time;
+		float deltaTime;
+
 		GLFWwindow* getID() { return ID; }
 		int getWidth() { return width; }
 		int getHeight() { return height; }
-		float getDeltaTime() { return deltaTime; }
-		float getTime() { return time; }
 	
 		void resize(int width, int height);
 		void update();
 	
 	private:
+		GLFWwindow* ID;
 		int width;
 		int height;
 
-		float time;
-		float deltaTime;
 };
 
 #endif

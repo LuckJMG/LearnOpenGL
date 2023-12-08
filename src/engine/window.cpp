@@ -1,4 +1,3 @@
-/*
 #include "window.hpp"
 
 #include <iostream>
@@ -10,19 +9,8 @@
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
-Window::Window(int width, int height, const char title[]):
-	width { width }, height { height }, time { 0.0f }, deltaTime { 0.0f } {
-	ID = glfwCreateWindow(width, height, title, NULL, NULL);
-	if (ID == NULL) {
-		std::cerr << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		exit(-1);
-	}
-}
-
-Window::~Window() {
-	glfwTerminate();
-}
+Window::Window(GLFWwindow* ID, int width, int height):
+	ID { ID }, width { width }, height { height } {}
 
 void Window::update() {
 	float lastFrame = time;
@@ -38,4 +26,3 @@ void Window::resize(int width, int height) {
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 } 
-*/

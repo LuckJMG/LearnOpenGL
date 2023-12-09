@@ -1,0 +1,108 @@
+#ifndef INPUT_HPP
+#define INPUT_HPP
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include "window.hpp"
+
+enum class Key {
+	A = GLFW_KEY_A,
+	B = GLFW_KEY_B,
+	C = GLFW_KEY_C,
+	D = GLFW_KEY_D,
+	E = GLFW_KEY_E,
+	F = GLFW_KEY_F,
+	G = GLFW_KEY_G,
+	H = GLFW_KEY_H,
+	I = GLFW_KEY_I,
+	J = GLFW_KEY_J,
+	K = GLFW_KEY_K,
+	L = GLFW_KEY_L,
+	M = GLFW_KEY_M,
+	N = GLFW_KEY_N,
+	O = GLFW_KEY_O,
+	P = GLFW_KEY_P,
+	Q = GLFW_KEY_Q,
+	R = GLFW_KEY_R,
+	S = GLFW_KEY_S,
+	T = GLFW_KEY_T,
+	U = GLFW_KEY_U,
+	V = GLFW_KEY_V,
+	W = GLFW_KEY_W,
+	X = GLFW_KEY_X,
+	Y = GLFW_KEY_Y,
+	Z = GLFW_KEY_Z,
+	num0 = GLFW_KEY_0,
+	num1 = GLFW_KEY_1,
+	num2 = GLFW_KEY_2,
+	num3 = GLFW_KEY_3,
+	num4 = GLFW_KEY_4,
+	num5 = GLFW_KEY_5,
+	num6 = GLFW_KEY_6,
+	num7 = GLFW_KEY_7,
+	num8 = GLFW_KEY_8,
+	num9 = GLFW_KEY_9,
+	space = GLFW_KEY_SPACE,
+	apostrophe = GLFW_KEY_APOSTROPHE,
+	comma = GLFW_KEY_COMMA,
+	minus = GLFW_KEY_MINUS,
+	period = GLFW_KEY_PERIOD,
+	slash = GLFW_KEY_SLASH,
+	semicolon = GLFW_KEY_SEMICOLON,
+	equal = GLFW_KEY_EQUAL,
+	leftBracket = GLFW_KEY_LEFT_BRACKET,
+	rightBracket = GLFW_KEY_RIGHT_BRACKET,
+	backslash = GLFW_KEY_BACKSLASH,
+	graveAccent = GLFW_KEY_GRAVE_ACCENT,
+	escape = GLFW_KEY_ESCAPE,
+	enter = GLFW_KEY_ENTER,
+	tab = GLFW_KEY_TAB,
+	backspace = GLFW_KEY_BACKSPACE,
+	insert = GLFW_KEY_INSERT,
+	deleteKey = GLFW_KEY_DELETE,
+	rightArrow = GLFW_KEY_RIGHT,
+	leftArrow = GLFW_KEY_LEFT,
+	downArrow = GLFW_KEY_DOWN,
+	upArrow = GLFW_KEY_UP,
+	pageUp = GLFW_KEY_PAGE_UP,
+	pageDown = GLFW_KEY_PAGE_DOWN,
+	home = GLFW_KEY_HOME,
+	end = GLFW_KEY_END,
+	capsLock = GLFW_KEY_CAPS_LOCK,
+	scrollLock = GLFW_KEY_SCROLL_LOCK,
+	numLock = GLFW_KEY_NUM_LOCK,
+	printScreen = GLFW_KEY_PRINT_SCREEN,
+	pause = GLFW_KEY_PAUSE,
+	F1 = GLFW_KEY_F1,
+	F2 = GLFW_KEY_F2,
+	F3 = GLFW_KEY_F3,
+	F4 = GLFW_KEY_F4,
+	F5 = GLFW_KEY_F5,
+	F6 = GLFW_KEY_F6,
+	F7 = GLFW_KEY_F7,
+	F8 = GLFW_KEY_F8,
+	F9 = GLFW_KEY_F9,
+	F10 = GLFW_KEY_F10,
+	F11 = GLFW_KEY_F11,
+	F12 = GLFW_KEY_F12,
+	leftShift = GLFW_KEY_LEFT_SHIFT,
+	leftControl = GLFW_KEY_LEFT_CONTROL,
+	leftAlt = GLFW_KEY_LEFT_ALT,
+	leftSuper = GLFW_KEY_LEFT_SUPER,
+	rightShift = GLFW_KEY_RIGHT_SHIFT,
+	rightControl = GLFW_KEY_RIGHT_CONTROL,
+	rightAlt = GLFW_KEY_RIGHT_ALT,
+	rightSuper = GLFW_KEY_RIGHT_SUPER,
+	menu = GLFW_KEY_MENU,
+};
+
+class Input {
+	public:
+		static bool onKeyPress(Key key, Window& window) { return glfwGetKey(window.getID(), static_cast<int>(key)) == GLFW_PRESS; }
+		static bool onKeyHold(Key key, Window& window) { return glfwGetKey(window.getID(), static_cast<int>(key)) == GLFW_REPEAT; }
+		static bool onKeyRelease(Key key, Window& window) { return glfwGetKey(window.getID(), static_cast<int>(key)) == GLFW_RELEASE; }
+};
+
+#endif
+

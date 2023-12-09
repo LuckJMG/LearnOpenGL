@@ -10,9 +10,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "engine/engine.c"
 #include "engine/engine.hpp"
 #include "engine/window.hpp"
+#include "engine/input.hpp"
 #include "engine/utils/debug.hpp"
 
 #include "engine/components/shader.hpp"
@@ -22,7 +22,7 @@
 #include "engine/objects/lightSource.h"
 #include "engine/objects/object.hpp"
 
-void processInput(GLFWwindow* window, float deltaTime);
+void processInput(Window& window, float deltaTime);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -67,7 +67,7 @@ int main() {
 	sphere.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
 
 	while(!glfwWindowShouldClose(window.getID())) {
-		processInput(window.getID(), window.deltaTime);
+		processInput(window, window.deltaTime);
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -102,30 +102,30 @@ int main() {
 	return 0;
 }
 
-void processInput(GLFWwindow* window, float deltaTime) {
-	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+void processInput(Window& window, float deltaTime) {
+	if(Input::onKeyPress(Key::escape, window))
+		glfwSetWindowShouldClose(window.getID(), true);
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::W, window))
 		camera.processKeyboard(CameraMovement::forward, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::S, window))
 		camera.processKeyboard(CameraMovement::backward, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::D, window))
 		camera.processKeyboard(CameraMovement::right, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::A, window))
 		camera.processKeyboard(CameraMovement::left, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::E, window))
 		camera.processKeyboard(CameraMovement::up, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::Q, window))
 		camera.processKeyboard(CameraMovement::down, deltaTime);
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::rightArrow, window))
 		camera.processArrows(CameraMovement::right, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::leftArrow, window))
 		camera.processArrows(CameraMovement::left, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::upArrow, window))
 		camera.processArrows(CameraMovement::up, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	if (Input::onKeyPress(Key::downArrow, window))
 		camera.processArrows(CameraMovement::down, deltaTime);
 }
 

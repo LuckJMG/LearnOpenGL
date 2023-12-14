@@ -22,12 +22,12 @@
 #include "engine/objects/lightSource.h"
 #include "engine/objects/object.hpp"
 
-void processInput(Window& window, float deltaTime);
+void processInput();
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 int main() {
-	Window window = Engine::start(800, 600, "LearnOpenGL");
+	Engine::start(800, 600, "LearnOpenGL");
 
 	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
 	Shader litColor { "src/shaders/model.vert", "src/shaders/litColor.frag" };
@@ -66,15 +66,14 @@ int main() {
 
 	sphere.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
 
-	while(!glfwWindowShouldClose(window.getID())) {
-		processInput(window, window.deltaTime);
-
+	while(!glfwWindowShouldClose(Window::getID())) {
+		processInput();
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 view = camera.getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), static_cast<float>(window.getWidth()) / window.getHeight(), 0.1f, 100.0f);
-		torch.position.z += sin(window.deltaTime);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), static_cast<float>(Window::getWidth()) / Window::getHeight(), 0.1f, 100.0f);
+		torch.position.z += sin(Window::time);
 
 		litColor.set("view", view);
 		litColor.set("projection", projection);
@@ -92,40 +91,40 @@ int main() {
 		litColor.set("material.shininess", 256.0f);
 		sphere.draw();
 
-		torch.position.z = -1.0f + sin(window.time);
+		torch.position.z = -1.0f + sin(Window::time);
 		torch.draw();
 
-		window.update();
+		Window::update();
 	}
 
 	Engine::stop();
 	return 0;
 }
 
-void processInput(Window& window, float deltaTime) {
-	if(Input::onKeyPress(Key::escape, window))
-		glfwSetWindowShouldClose(window.getID(), true);
+void processInput() {
+	if(Input::onKeyPress(Key::escape))
+		glfwSetWindowShouldClose(Window::getID(), true);
 
-	if (Input::onKeyPress(Key::W, window))
-		camera.processKeyboard(CameraMovement::forward, deltaTime);
-	if (Input::onKeyPress(Key::S, window))
-		camera.processKeyboard(CameraMovement::backward, deltaTime);
-	if (Input::onKeyPress(Key::D, window))
-		camera.processKeyboard(CameraMovement::right, deltaTime);
-	if (Input::onKeyPress(Key::A, window))
-		camera.processKeyboard(CameraMovement::left, deltaTime);
-	if (Input::onKeyPress(Key::E, window))
-		camera.processKeyboard(CameraMovement::up, deltaTime);
-	if (Input::onKeyPress(Key::Q, window))
-		camera.processKeyboard(CameraMovement::down, deltaTime);
+	if (Input::onKeyPress(Key::W))
+		camera.processKeyboard(CameraMovement::forward);
+	if (Input::onKeyPress(Key::S))
+		camera.processKeyboard(CameraMovement::backward);
+	if (Input::onKeyPress(Key::D))
+		camera.processKeyboard(CameraMovement::right);
+	if (Input::onKeyPress(Key::A))
+		camera.processKeyboard(CameraMovement::left);
+	if (Input::onKeyPress(Key::E))
+		camera.processKeyboard(CameraMovement::up);
+	if (Input::onKeyPress(Key::Q))
+		camera.processKeyboard(CameraMovement::down);
 
-	if (Input::onKeyPress(Key::rightArrow, window))
-		camera.processArrows(CameraMovement::right, deltaTime);
-	if (Input::onKeyPress(Key::leftArrow, window))
-		camera.processArrows(CameraMovement::left, deltaTime);
-	if (Input::onKeyPress(Key::upArrow, window))
-		camera.processArrows(CameraMovement::up, deltaTime);
-	if (Input::onKeyPress(Key::downArrow, window))
-		camera.processArrows(CameraMovement::down, deltaTime);
+	if (Input::onKeyPress(Key::rightArrow))
+		camera.processArrows(CameraMovement::right);
+	if (Input::onKeyPress(Key::leftArrow))
+		camera.processArrows(CameraMovement::left);
+	if (Input::onKeyPress(Key::upArrow))
+		camera.processArrows(CameraMovement::up);
+	if (Input::onKeyPress(Key::downArrow))
+		camera.processArrows(CameraMovement::down);
 }
 

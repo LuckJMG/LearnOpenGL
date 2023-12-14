@@ -41,8 +41,8 @@ public:
 	float getZoom() { return zoom; };
 	void setZoom(float zoom);
 
-	void processKeyboard(CameraMovement direction, float deltaTime);
-	void processArrows(CameraMovement direction, float deltaTime, bool constrainPitch = true);
+	void processKeyboard(CameraMovement direction);
+	void processArrows(CameraMovement direction, bool constrainPitch = true);
 	void processMouseScroll(float yOffset);
 
 private:

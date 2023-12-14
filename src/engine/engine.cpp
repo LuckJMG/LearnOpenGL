@@ -9,7 +9,12 @@
 
 #include "window.hpp"
 
-Window Engine::start(int width, int height, const char* title) {
+void Engine::start(int width, int height, const char* title) {
+	if (isRunning) {
+		std::cerr << "Engine already running" << std::endl;
+		return;
+	}
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -34,7 +39,8 @@ Window Engine::start(int width, int height, const char* title) {
 
 	glEnable(GL_DEPTH_TEST);
 
-	return Window { ID, width, height };
+	Window window { ID, width, height };
+	isRunning = true;
 }
 
 

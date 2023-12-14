@@ -8,20 +8,25 @@ class Window {
 	public:
 		Window(GLFWwindow* ID, int width, int height);
 
-		float time;
-		float deltaTime;
+		static inline float time { 0.0f };
+		static inline float deltaTime { 0.0f };
 
-		GLFWwindow* getID() { return ID; }
-		int getWidth() { return width; }
-		int getHeight() { return height; }
-	
-		void update();
+		static GLFWwindow* getID() { return ID; }
+		static int getWidth() { return width; }
+		static int getHeight() { return height; }
+
+		static void update();
 	
 	private:
-		GLFWwindow* ID;
-		int width;
-		int height;
+		static void setID(GLFWwindow* windowID) { ID = windowID; }
+		static void setSize(int windowWidth, int windowHeight) {
+			width = windowWidth;
+			height = windowHeight;
+		}
 
+		static inline GLFWwindow* ID { NULL };
+		static inline int width { 0 };
+		static inline int height { 0 };
 };
 
 #endif

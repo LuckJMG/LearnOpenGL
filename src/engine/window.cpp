@@ -1,13 +1,22 @@
 #include "window.hpp"
 
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
-Window::Window(GLFWwindow* ID, int width, int height):
-	ID { ID }, width { width }, height { height } {
+Window::Window(GLFWwindow* ID, int width, int height) {
+	if (Window::getID()) {
+		std::cerr << "There is an attempt to create a second window instance" << std::endl;
+		exit(-1);
+	}
+
 	glfwSetFramebufferSizeCallback(ID, framebufferSizeCallback);
+
+	setID(ID);
+	setSize(width, height);
 }
 
 void Window::update() {

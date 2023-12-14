@@ -1,10 +1,12 @@
+#include "camera.hpp"
+
+#include <iostream>
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <iostream>
-
-#include "camera.hpp"
+#include "../window.hpp"
 
 glm::mat4 Camera::getViewMatrix() {
 	return glm::lookAt(position, position + front, up);
@@ -41,8 +43,8 @@ void Camera::setZoom(float zoom) {
 	this->zoom = zoom;
 }
 
-void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
-	float velocity = movementSpeed * deltaTime;
+void Camera::processKeyboard(CameraMovement direction) {
+	float velocity = movementSpeed * Window::deltaTime;
 	if (direction == CameraMovement::forward)
 		position += front * velocity;
 	if (direction == CameraMovement::backward)
@@ -56,8 +58,8 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
 	if (direction == CameraMovement::down)
 		position -= up * velocity;
 }
-void Camera::processArrows(CameraMovement direction, float deltaTime, bool constrainPitch) {
-	float velocity = rotationSpeed * deltaTime;
+void Camera::processArrows(CameraMovement direction, bool constrainPitch) {
+	float velocity = rotationSpeed * Window::deltaTime;
 
 	if (direction == CameraMovement::left)
 		yaw -= velocity;

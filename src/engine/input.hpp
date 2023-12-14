@@ -99,9 +99,9 @@ enum class Key {
 
 class Input {
 	public:
-		static bool onKeyPress(Key key, Window& window) { return glfwGetKey(window.getID(), static_cast<int>(key)) == GLFW_PRESS; }
-		static bool onKeyHold(Key key, Window& window) { return glfwGetKey(window.getID(), static_cast<int>(key)) == GLFW_REPEAT; }
-		static bool onKeyRelease(Key key, Window& window) { return glfwGetKey(window.getID(), static_cast<int>(key)) == GLFW_RELEASE; }
+		static bool onKeyPress(Key key) { return glfwGetKey(Window::getID(), static_cast<int>(key)) == GLFW_PRESS; }
+		static bool onKeyHold(Key key) { return glfwGetKey(Window::getID(), static_cast<int>(key)) == GLFW_REPEAT; }
+		static bool onKeyRelease(Key key) { return glfwGetKey(Window::getID(), static_cast<int>(key)) == GLFW_RELEASE; }
 };
 
 #endif

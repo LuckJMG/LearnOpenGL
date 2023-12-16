@@ -10,7 +10,7 @@
 #include "window.hpp"
 
 void Engine::start(int width, int height, const char* title) {
-	if (isRunning) {
+	if (running) {
 		std::cerr << "Engine already running" << std::endl;
 		return;
 	}
@@ -40,7 +40,7 @@ void Engine::start(int width, int height, const char* title) {
 	glEnable(GL_DEPTH_TEST);
 
 	Window window { ID, width, height };
-	isRunning = true;
+	running = true;
 }
 
 

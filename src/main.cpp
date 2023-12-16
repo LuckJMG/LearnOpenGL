@@ -8,7 +8,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "engine/engine.hpp"
 #include "engine/window.hpp"
@@ -24,10 +23,10 @@
 
 void processInput();
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
 int main() {
 	Engine::start(800, 600, "LearnOpenGL");
+	Camera camera { glm::vec3 { 0.0f, 0.0f, 3.0f } };
+	Window::currentCamera = &camera;
 
 	Shader unlitColor { "src/shaders/model.vert", "src/shaders/unlitColor.frag" };
 	Shader litColor { "src/shaders/model.vert", "src/shaders/litColor.frag" };
@@ -66,13 +65,15 @@ int main() {
 
 	sphere.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
 
-	while(!glfwWindowShouldClose(Window::getID())) {
+	while(Engine::isRunning()) {
+		Window::update();
+
 		processInput();
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::mat4 view = camera.getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), static_cast<float>(Window::getWidth()) / Window::getHeight(), 0.1f, 100.0f);
+		glm::mat4 view = Window::getViewMatrix();
+		glm::mat4 projection = Window::getProjectionMatrix();
 		torch.position.z += sin(Window::time);
 
 		litColor.set("view", view);
@@ -93,8 +94,6 @@ int main() {
 
 		torch.position.z = -1.0f + sin(Window::time);
 		torch.draw();
-
-		Window::update();
 	}
 
 	Engine::stop();
@@ -102,6 +101,8 @@ int main() {
 }
 
 void processInput() {
+	Camera& camera = *Window::currentCamera;
+
 	if(Input::onKeyPress(Key::escape))
 		glfwSetWindowShouldClose(Window::getID(), true);
 

@@ -5,6 +5,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "objects/camera.hpp"
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 Window::Window(GLFWwindow* ID, int width, int height) {
@@ -20,14 +24,16 @@ Window::Window(GLFWwindow* ID, int width, int height) {
 }
 
 void Window::update() {
+	glfwSwapBuffers(ID);
+	glfwPollEvents();
+
 	float lastFrame = time;
 	time = static_cast<float>(glfwGetTime());
 	deltaTime = time - lastFrame;
 
-	glfwSwapBuffers(ID);
-	glfwPollEvents();
+	view = currentCamera->getViewMatrix();
+	projection = currentCamera->getProjectionMatrix();
 }
-
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);

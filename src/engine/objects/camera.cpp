@@ -12,6 +12,11 @@ glm::mat4 Camera::getViewMatrix() {
 	return glm::lookAt(position, position + front, up);
 }
 
+glm::mat4 Camera::getProjectionMatrix() {
+	float fov = glm::radians(this->zoom);
+	return glm::perspective(fov, Window::getAspectRatio(), nearPlane, farPlane);
+}
+
 void Camera::setMovementSpeed(double movementSpeed) {
 	if (movementSpeed <= 0) {
 		std::cerr << "WARNING: Setting camera movement speed below or equal to 0" << std::endl;

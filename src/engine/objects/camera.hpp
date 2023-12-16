@@ -23,6 +23,9 @@ public:
 	float yaw;
 	float pitch;
 
+	float nearPlane;
+	float farPlane;
+
 	Camera(
 		glm::vec3 position = glm::vec3(0.0f), 
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), 
@@ -30,11 +33,13 @@ public:
 		float pitch = 0.0f
 	)
 	: position { position }, worldUp { up }, yaw { yaw }, pitch { pitch }, 
-		movementSpeed { 1.0f }, rotationSpeed { 100.0f }, zoom { 45.0f } {
+		nearPlane { 0.1f }, farPlane { 100.0f }, movementSpeed { 1.0f }, 
+		rotationSpeed { 100.0f }, zoom { 45.0f } {
 		updateCameraVectors();
 	};
 
 	glm::mat4 getViewMatrix();
+	glm::mat4 getProjectionMatrix();
 
 	void setMovementSpeed(double movementSpeed);
 	void setRotationSpeed(double rotationSpeed);

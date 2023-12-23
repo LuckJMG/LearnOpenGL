@@ -13,7 +13,7 @@ glm::mat4 Camera::getViewMatrix() {
 }
 
 glm::mat4 Camera::getProjectionMatrix() {
-	float fov = glm::radians(this->zoom);
+	float fov = glm::radians(zoom);
 	return glm::perspective(fov, Window::getAspectRatio(), nearPlane, farPlane);
 }
 

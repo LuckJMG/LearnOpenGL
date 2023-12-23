@@ -5,12 +5,11 @@
 
 #include "../components/shader.hpp"
 #include "../components/model.hpp"
+#include "../components/transform.hpp"
 
 class Object {
 	public:
-		glm::vec3 position;
-		glm::vec3 rotation;
-		glm::vec3 scale;
+		Transform transform {};
 
 		Object(Model model, Shader shader);
 		void draw();

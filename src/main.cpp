@@ -52,8 +52,8 @@ int main() {
 
 	glm::vec3 lightColor = glm::vec3 { 1.0f };
 	unlitColor.set("color", lightColor);
-	torch.position = glm::vec3 { -3.0f, 3.0f, -1.0f };
-	torch.scale = glm::vec3 { 0.25f };
+	torch.transform.position = glm::vec3 { -3.0f, 3.0f, -1.0f };
+	torch.transform.scale = glm::vec3 { 0.25f };
 
 	litColor.set("pointLightsAmount", 1);
 	litColor.set("pointLights[0].constant", pointLight.constant);
@@ -63,7 +63,7 @@ int main() {
 	litColor.set("pointLights[0].diffuseIntensity", pointLight.diffuseIntensity);
 	litColor.set("pointLights[0].specularIntensity", pointLight.specularIntensity);
 
-	sphere.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
+	sphere.transform.position = glm::vec3 { 0.0f, 2.0f, -5.0f };
 
 	while(Engine::isRunning()) {
 		Window::update();
@@ -74,12 +74,12 @@ int main() {
 
 		glm::mat4 view = Window::getViewMatrix();
 		glm::mat4 projection = Window::getProjectionMatrix();
-		torch.position.z += sin(Window::time);
+		torch.transform.position.z += sin(Window::time);
 
 		litColor.set("view", view);
 		litColor.set("projection", projection);
 		litColor.set("cameraPosition", camera.position);
-		litColor.set("pointLights[0].position", torch.position);
+		litColor.set("pointLights[0].position", torch.transform.position);
 
 		unlitColor.set("view", view);
 		unlitColor.set("projection", projection);
@@ -92,7 +92,7 @@ int main() {
 		litColor.set("material.shininess", 256.0f);
 		sphere.draw();
 
-		torch.position.z = -1.0f + sin(Window::time);
+		torch.transform.position.z = -1.0f + sin(Window::time);
 		torch.draw();
 	}
 
